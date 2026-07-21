@@ -10,9 +10,10 @@
       --bg: #090d16;
       --card-bg: #0f172a;
       --border-color: #1e293b;
+      --accent-blue: #2563eb;
       --accent-cyan: #38bdf8;
-      --accent-green: #22c55e;
       --accent-red: #ef4444;
+      --accent-orange: #f97316;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
     }
@@ -36,7 +37,6 @@
       gap: 12px;
     }
 
-    /* Encabezado Principal */
     .header {
       border-bottom: 1px solid var(--border-color);
       padding-bottom: 10px;
@@ -55,7 +55,6 @@
       margin: 4px 0 0 0;
     }
 
-    /* Tarjetas estilo Dark Glass */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
@@ -64,7 +63,6 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
 
-    /* Botones y Controles */
     .controls {
       display: flex;
       flex-direction: column;
@@ -86,9 +84,7 @@
       font-size: 0.9em;
       outline: none;
     }
-    input:focus {
-      border-color: var(--accent-cyan);
-    }
+    input:focus { border-color: var(--accent-cyan); }
 
     button {
       border: none;
@@ -118,7 +114,6 @@
       color: var(--text-muted);
     }
 
-    /* KPI / Badge de Alerta en Encabezado */
     .kpi-badge {
       display: flex;
       justify-content: space-between;
@@ -138,35 +133,41 @@
       font-size: 1.2em;
       font-weight: 800;
     }
-    .kpi-value.green { color: var(--accent-green); text-shadow: 0 0 8px rgba(34, 197, 94, 0.3); }
-    .kpi-value.red { color: var(--accent-red); text-shadow: 0 0 8px rgba(239, 68, 68, 0.3); }
+    .kpi-value.blue { color: var(--accent-cyan); text-shadow: 0 0 8px rgba(56, 189, 248, 0.4); }
+    .kpi-value.red { color: var(--accent-red); text-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }
 
-    /* Gráfico */
     .chart-box {
       height: 200px;
       position: relative;
     }
 
-    /* Tabla Neon */
+    .chart-title {
+      font-size: 0.75em;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.75em;
+      font-size: 0.72em;
       margin-top: 5px;
     }
     th {
       color: var(--text-muted);
       border-bottom: 1px solid var(--border-color);
-      padding: 6px;
+      padding: 6px 2px;
       text-align: center;
       text-transform: uppercase;
     }
     td {
-      padding: 8px 4px;
+      padding: 8px 2px;
       text-align: center;
       border-bottom: 1px solid rgba(255,255,255,0.03);
     }
-    .green-text { color: var(--accent-green); font-weight: 700; }
+    .blue-text { color: var(--accent-cyan); font-weight: 700; }
     .red-text { color: var(--accent-red); font-weight: 700; }
   </style>
 </head>
@@ -174,37 +175,42 @@
 
 <div class="dashboard">
 
-  <!-- Header Estilo SmartMonitor -->
   <div class="header">
     <h1>SmartMonitor <span style="color: var(--accent-cyan); font-weight: 300;">| IA Financiera</span></h1>
-    <p>Inferencia en Borde • Predicción de Flujo Neto Trimestral</p>
+    <p>Inferencia en Borde • Proyección Semestral (6 Meses)</p>
   </div>
 
-  <!-- Controles -->
   <div class="card controls">
     <button class="btn-sync" onclick="sincronizarPesos()">1. Sincronizar Modelo (API)</button>
     <div id="status" class="status-text">Estado: Esperando acción...</div>
 
     <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 4px;">
-      <label for="mesInicio">Mes de Inicio Trimestre</label>
+      <label for="mesInicio">Mes de Inicio Semestre</label>
       <input type="number" id="mesInicio" value="10" min="1">
     </div>
 
     <button class="btn-calc" onclick="calcularProyeccion()">2. Ejecutar Inferencia IA</button>
   </div>
 
-  <!-- KPI Resumen (Métrica de Impacto) -->
+  <!-- KPI Resumen Semestral -->
   <div class="kpi-badge" id="kpiCard" style="display: none;">
     <div>
-      <div class="kpi-title">Proyección Neto Trimestral</div>
+      <div class="kpi-title">Neto Acumulado Semestre (6M)</div>
       <div id="kpiLabel" style="font-size: 0.75em; color: #cbd5e1; margin-top: 2px;">--</div>
     </div>
-    <div id="kpiValue" class="kpi-value green">$0.00M</div>
+    <div id="kpiValue" class="kpi-value blue">$0.00M</div>
   </div>
 
-  <!-- Contenedor del Gráfico -->
-  <div class="card chart-box" id="chartCard" style="display: none;">
-    <canvas id="flujoChart"></canvas>
+  <!-- Gráfico 1: Área de Flujo Neto -->
+  <div class="card chart-box" id="chartCard1" style="display: none;">
+    <div class="chart-title">Evolución de Flujo Neto Mensual</div>
+    <div style="height: 170px;"><canvas id="flujoChart"></canvas></div>
+  </div>
+
+  <!-- Gráfico 2: Comparativa vs Interés Bancario 3% -->
+  <div class="card chart-box" id="chartCard2" style="display: none;">
+    <div class="chart-title">Comparativa: Flujo Operativo vs Interés 3% Vtas</div>
+    <div style="height: 170px;"><canvas id="comparativaChart"></canvas></div>
   </div>
 
   <!-- Tabla Detalle -->
@@ -216,11 +222,12 @@
 
 <script>
   const API_URL = "https://api-pesos-modelo.onrender.com/api/v1/model-weights";
-  let chartInstance = null;
+  let chartInstance1 = null;
+  let chartInstance2 = null;
 
   async function sincronizarPesos() {
     const statusDiv = document.getElementById("status");
-    statusDiv.style.color = varColor('--accent-cyan');
+    statusDiv.style.color = "#38bdf8";
     statusDiv.innerText = "Conectando con microservicio...";
 
     try {
@@ -228,16 +235,12 @@
       if (!response.ok) throw new Error();
       const data = await response.json();
       localStorage.setItem("pesos_modelo", JSON.stringify(data.pesos));
-      statusDiv.style.color = varColor('--accent-green');
+      statusDiv.style.color = "#38bdf8";
       statusDiv.innerText = `Modelo sincronizado: w=${data.pesos.w}, b=${data.pesos.b}`;
     } catch (e) {
-      statusDiv.style.color = varColor('--accent-red');
+      statusDiv.style.color = "#ef4444";
       statusDiv.innerText = "Error de sincronización con Render.";
     }
-  }
-
-  function varColor(name) {
-    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
 
   function calcularProyeccion() {
@@ -250,11 +253,15 @@
     }
 
     const { w, b } = JSON.parse(pesosGuardados);
-    const MARGEN_COMPRAS = 0.70;
-    const GASTO_FIJO = 6.0;
+    
+    // NUEVOS PARÁMETROS SOLICITADOS
+    const MARGEN_COMPRAS = 0.70; // 70% Compras
+    const GASTO_FIJO = 5.0;      // $5M Fijos
+    const TASA_BANCO = 0.03;     // 3% Interés Bancario
 
     let mesesLabels = [];
     let flujosData = [];
+    let interesBancarioData = [];
     let totalFlujo = 0;
 
     let htmlTabla = `
@@ -262,45 +269,51 @@
         <thead>
           <tr>
             <th>Mes</th>
-            <th>Ventas (IA)</th>
-            <th>Compras</th>
+            <th>Ventas</th>
+            <th>Comp.(70%)</th>
             <th>Fijos</th>
             <th>Neto</th>
+            <th>Banco(3%)</th>
           </tr>
         </thead>
         <tbody>
     `;
 
-    for (let i = 0; i < 3; i++) {
+    // PROYECCIÓN A 6 MESES (SEMESTRE)
+    for (let i = 0; i < 6; i++) {
       let m = mesInicio + i;
       let ventaIA = (w * m) + b;
       let compras = ventaIA * MARGEN_COMPRAS;
       let flujoNeto = ventaIA - compras - GASTO_FIJO;
+      let interesBanco = ventaIA * TASA_BANCO;
 
       totalFlujo += flujoNeto;
-      mesesLabels.push(`Mes ${m}`);
+      mesesLabels.push(`M${m}`);
       flujosData.push(parseFloat(flujoNeto.toFixed(2)));
+      interesBancarioData.push(parseFloat(interesBanco.toFixed(2)));
 
-      let clase = flujoNeto >= 0 ? "green-text" : "red-text";
+      let clase = flujoNeto >= 0 ? "blue-text" : "red-text";
 
       htmlTabla += `
         <tr>
           <td><strong>M${m}</strong></td>
-          <td>$${ventaIA.toFixed(2)}M</td>
-          <td>-$${compras.toFixed(2)}M</td>
-          <td>-$${GASTO_FIJO.toFixed(2)}M</td>
+          <td>$${ventaIA.toFixed(1)}M</td>
+          <td>-$${compras.toFixed(1)}M</td>
+          <td>-$${GASTO_FIJO.toFixed(1)}M</td>
           <td class="${clase}">$${flujoNeto.toFixed(2)}M</td>
+          <td style="color: #f97316;">$${interesBanco.toFixed(2)}M</td>
         </tr>
       `;
     }
 
-    let claseTotal = totalFlujo >= 0 ? "green-text" : "red-text";
+    let claseTotal = totalFlujo >= 0 ? "blue-text" : "red-text";
     htmlTabla += `
         </tbody>
         <tfoot>
           <tr style="font-weight: bold; border-top: 1px solid #334155;">
-            <td colspan="4" style="text-align: right; padding-right: 10px; color: var(--text-muted);">NETO ACUMULADO:</td>
+            <td colspan="4" style="text-align: right; color: var(--text-muted);">NETO SEMESTRE:</td>
             <td class="${claseTotal}">$${totalFlujo.toFixed(2)}M</td>
+            <td>--</td>
           </tr>
         </tfoot>
       </table>
@@ -308,43 +321,44 @@
 
     document.getElementById("resultadoTabla").innerHTML = htmlTabla;
 
-    // Mostrar Secciones
+    // Mostrar tarjetas
     document.getElementById("kpiCard").style.display = "flex";
-    document.getElementById("chartCard").style.display = "block";
+    document.getElementById("chartCard1").style.display = "block";
+    document.getElementById("chartCard2").style.display = "block";
     document.getElementById("tablaCard").style.display = "block";
 
-    // KPI Header
+    // KPI Header (Azul si es > 0, Rojo si es < 0)
     const kpiValue = document.getElementById("kpiValue");
     const kpiLabel = document.getElementById("kpiLabel");
 
     if (totalFlujo >= 0) {
-      kpiValue.className = "kpi-value green";
+      kpiValue.className = "kpi-value blue";
       kpiValue.innerText = `+$${totalFlujo.toFixed(2)}M`;
       kpiLabel.innerText = "Estructura Saludable (Superávit)";
     } else {
       kpiValue.className = "kpi-value red";
       kpiValue.innerText = `-$${Math.abs(totalFlujo).toFixed(2)}M`;
-      kpiLabel.innerText = "Riesgo de Liquidez (Déficit)";
+      kpiLabel.innerText = "Déficit Semestral Proyectado";
     }
 
-    renderizarGrafico(mesesLabels, flujosData);
+    renderizarGraficoFlujo(mesesLabels, flujosData);
+    renderizarGraficoComparativo(mesesLabels, flujosData, interesBancarioData);
   }
 
-  function renderizarGrafico(labels, data) {
+  // Gráfico 1: Área Azul / Roja
+  function renderizarGraficoFlujo(labels, data) {
     const ctx = document.getElementById('flujoChart').getContext('2d');
+    if (chartInstance1) chartInstance1.destroy();
 
-    if (chartInstance) chartInstance.destroy();
+    const gradientBlue = ctx.createLinearGradient(0, 0, 0, 180);
+    gradientBlue.addColorStop(0, 'rgba(56, 189, 248, 0.4)');
+    gradientBlue.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
 
-    // Degradados oscuros estilo dashboard
-    const gradientGreen = ctx.createLinearGradient(0, 0, 0, 200);
-    gradientGreen.addColorStop(0, 'rgba(34, 197, 94, 0.4)');
-    gradientGreen.addColorStop(1, 'rgba(34, 197, 94, 0.0)');
-
-    const gradientRed = ctx.createLinearGradient(0, 0, 0, 200);
+    const gradientRed = ctx.createLinearGradient(0, 0, 0, 180);
     gradientRed.addColorStop(0, 'rgba(239, 68, 68, 0.4)');
     gradientRed.addColorStop(1, 'rgba(239, 68, 68, 0.0)');
 
-    chartInstance = new Chart(ctx, {
+    chartInstance1 = new Chart(ctx, {
       type: 'line',
       data: {
         labels: labels,
@@ -352,14 +366,14 @@
           label: 'Flujo Neto',
           data: data,
           borderWidth: 2,
-          tension: 0.4,
-          pointRadius: 5,
-          pointBackgroundColor: data.map(v => v >= 0 ? '#22c55e' : '#ef4444'),
+          tension: 0.3,
+          pointRadius: 4,
+          pointBackgroundColor: data.map(v => v >= 0 ? '#38bdf8' : '#ef4444'),
           borderColor: '#38bdf8',
           fill: {
             target: 'origin',
-            above: gradientGreen,
-            below: gradientRed
+            above: gradientBlue, // Azul arriba de cero
+            below: gradientRed   // Rojo abajo de cero
           }
         }]
       },
@@ -368,20 +382,64 @@
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          x: {
-            grid: { color: 'rgba(255,255,255,0.05)' },
-            ticks: { color: '#94a3b8', font: { size: 10 } }
-          },
+          x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 9 } } },
           y: {
             grid: {
               color: (ctx) => ctx.tick.value === 0 ? '#38bdf8' : 'rgba(255,255,255,0.05)',
               lineWidth: (ctx) => ctx.tick.value === 0 ? 1.5 : 1
             },
-            ticks: {
-              color: '#94a3b8',
-              font: { size: 10 },
-              callback: (val) => '$' + val + 'M'
-            }
+            ticks: { color: '#94a3b8', font: { size: 9 }, callback: (v) => '$' + v + 'M' }
+          }
+        }
+      }
+    });
+  }
+
+  // Gráfico 2: Comparativa Flujo Neto vs Rendimiento 3%
+  function renderizarGraficoComparativo(labels, flujoData, bancoData) {
+    const ctx = document.getElementById('comparativaChart').getContext('2d');
+    if (chartInstance2) chartInstance2.destroy();
+
+    chartInstance2 = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Flujo Neto (IA)',
+            data: flujoData,
+            borderColor: '#38bdf8', // Azul
+            borderWidth: 2,
+            tension: 0.3,
+            pointRadius: 4,
+            pointBackgroundColor: flujoData.map(v => v >= 0 ? '#38bdf8' : '#ef4444')
+          },
+          {
+            label: 'Interés 3% Vtas',
+            data: bancoData,
+            borderColor: '#f97316', // Naranja/Línea de comparación
+            borderWidth: 2,
+            borderDash: [5, 5],    // Línea punteada
+            tension: 0.3,
+            pointRadius: 3,
+            pointBackgroundColor: '#f97316'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            labels: { color: '#94a3b8', font: { size: 9 }, boxWidth: 12 }
+          }
+        },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 9 } } },
+          y: {
+            grid: { color: 'rgba(255,255,255,0.05)' },
+            ticks: { color: '#94a3b8', font: { size: 9 }, callback: (v) => '$' + v + 'M' }
           }
         }
       }
