@@ -31,7 +31,6 @@
       align-items: center;
     }
 
-    /* Grilla Principal Full Screen */
     .dashboard-container {
       width: 100%;
       max-width: 1280px;
@@ -61,18 +60,17 @@
       margin: 2px 0 0 0;
     }
 
-    /* Layout en 2 Columnas para PC / Laptop */
+    /* Layout 50% Izquierda - 50% Derecha */
     .main-grid {
       display: grid;
-      grid-template-columns: 320px 1fr;
+      grid-template-columns: 1fr 1fr; /* Exactamente 50% y 50% */
       gap: 12px;
-      align-items: start;
+      align-items: stretch;
     }
 
-    /* Columna Derecha de Gráficos (Grilla de 2 columnas) */
-    .charts-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+    .left-column, .right-column {
+      display: flex;
+      flex-direction: column;
       gap: 12px;
     }
 
@@ -83,13 +81,6 @@
       border-radius: 10px;
       padding: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    }
-
-    /* Columna Izquierda: Controles y Tabla */
-    .left-column {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
     }
 
     label {
@@ -162,7 +153,7 @@
     .kpi-value.red { color: var(--accent-red); text-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }
 
     .chart-box {
-      height: 240px;
+      height: 210px;
       position: relative;
     }
 
@@ -177,29 +168,26 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.68em;
+      font-size: 0.7em;
     }
     th {
       color: var(--text-muted);
       border-bottom: 1px solid var(--border-color);
-      padding: 4px 2px;
+      padding: 6px 2px;
       text-align: center;
       text-transform: uppercase;
     }
     td {
-      padding: 5px 2px;
+      padding: 6px 2px;
       text-align: center;
       border-bottom: 1px solid rgba(255,255,255,0.03);
     }
     .blue-text { color: var(--accent-cyan); font-weight: 700; }
     .red-text { color: var(--accent-red); font-weight: 700; }
 
-    /* Adaptación para pantallas pequeñas (Celulares) */
+    /* Adaptación para pantallas táctiles/celulares */
     @media (max-width: 900px) {
       .main-grid {
-        grid-template-columns: 1fr;
-      }
-      .charts-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -225,10 +213,10 @@
     </div>
   </div>
 
-  <!-- Layout Principal -->
+  <!-- Layout Principal (50% Izquierda / 50% Derecha) -->
   <div class="main-grid">
 
-    <!-- Columna Izquierda: Panel de Control y Tabla -->
+    <!-- Columna Izquierda (Controles + Tabla) -->
     <div class="left-column">
       <div class="card controls">
         <button class="btn-sync" onclick="sincronizarPesos()">1. Sincronizar Modelo (API)</button>
@@ -243,23 +231,23 @@
       </div>
 
       <!-- Tabla Detalle -->
-      <div class="card" id="tablaCard" style="display: none;">
+      <div class="card" id="tablaCard" style="display: none; flex-grow: 1;">
         <div id="resultadoTabla"></div>
       </div>
     </div>
 
-    <!-- Columna Derecha: Gráficos lado a lado -->
-    <div class="charts-grid">
-      <!-- Gráfico 1 -->
+    <!-- Columna Derecha (Gráfico 1 Arriba, Gráfico 2 Abajo) -->
+    <div class="right-column">
+      <!-- Gráfico 1: Flujo Neto Mensual -->
       <div class="card chart-box" id="chartCard1" style="display: none;">
         <div class="chart-title">Flujo Neto Mensual</div>
-        <div style="height: 200px;"><canvas id="flujoChart"></canvas></div>
+        <div style="height: 170px;"><canvas id="flujoChart"></canvas></div>
       </div>
 
-      <!-- Gráfico 2 -->
+      <!-- Gráfico 2: Flujo vs Interés 3% Vtas -->
       <div class="card chart-box" id="chartCard2" style="display: none;">
         <div class="chart-title">Flujo vs Interés 3% Vtas</div>
-        <div style="height: 200px;"><canvas id="comparativaChart"></canvas></div>
+        <div style="height: 170px;"><canvas id="comparativaChart"></canvas></div>
       </div>
     </div>
 
@@ -394,11 +382,11 @@
     const ctx = document.getElementById('flujoChart').getContext('2d');
     if (chartInstance1) chartInstance1.destroy();
 
-    const gradientBlue = ctx.createLinearGradient(0, 0, 0, 180);
+    const gradientBlue = ctx.createLinearGradient(0, 0, 0, 150);
     gradientBlue.addColorStop(0, 'rgba(56, 189, 248, 0.4)');
     gradientBlue.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
 
-    const gradientRed = ctx.createLinearGradient(0, 0, 0, 180);
+    const gradientRed = ctx.createLinearGradient(0, 0, 0, 150);
     gradientRed.addColorStop(0, 'rgba(239, 68, 68, 0.4)');
     gradientRed.addColorStop(1, 'rgba(239, 68, 68, 0.0)');
 
