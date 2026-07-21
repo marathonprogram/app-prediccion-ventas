@@ -13,10 +13,11 @@
       --accent-blue: #2563eb;
       --accent-cyan: #38bdf8;
       --accent-red: #ef4444;
-      --accent-orange: #f97316;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
     }
+
+    * { box-sizing: border-box; }
 
     body {
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -24,14 +25,16 @@
       color: var(--text-main);
       padding: 15px;
       margin: 0;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
+      align-items: center;
     }
 
-    .dashboard {
+    /* Grilla Principal Full Screen */
+    .dashboard-container {
       width: 100%;
-      max-width: 520px;
-      background-color: var(--bg);
+      max-width: 1280px;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -39,7 +42,10 @@
 
     .header {
       border-bottom: 1px solid var(--border-color);
-      padding-bottom: 10px;
+      padding-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .header h1 {
       font-size: 1.1em;
@@ -52,24 +58,42 @@
     .header p {
       font-size: 0.75em;
       color: var(--text-muted);
-      margin: 4px 0 0 0;
+      margin: 2px 0 0 0;
     }
 
+    /* Layout en 2 Columnas para PC / Laptop */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    /* Columna Derecha de Gráficos (Grilla de 2 columnas) */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* Tarjetas Dark Glass */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 14px;
+      border-radius: 10px;
+      padding: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
 
-    .controls {
+    /* Columna Izquierda: Controles y Tabla */
+    .left-column {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
+
     label {
-      font-size: 0.75em;
+      font-size: 0.7em;
       color: var(--accent-cyan);
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -80,22 +104,23 @@
       border: 1px solid var(--border-color);
       border-radius: 6px;
       color: #fff;
-      padding: 8px 12px;
-      font-size: 0.9em;
+      padding: 6px 10px;
+      font-size: 0.85em;
       outline: none;
+      width: 100%;
     }
-    input:focus { border-color: var(--accent-cyan); }
 
     button {
       border: none;
       border-radius: 6px;
-      padding: 10px;
+      padding: 8px;
       font-weight: 700;
-      font-size: 0.8em;
+      font-size: 0.75em;
       letter-spacing: 0.5px;
       cursor: pointer;
       text-transform: uppercase;
       transition: all 0.2s;
+      width: 100%;
     }
     .btn-sync {
       background: rgba(56, 189, 248, 0.1);
@@ -109,7 +134,7 @@
     }
 
     .status-text {
-      font-size: 0.7em;
+      font-size: 0.65em;
       text-align: center;
       color: var(--text-muted);
     }
@@ -120,102 +145,124 @@
       align-items: center;
       background: rgba(15, 23, 42, 0.8);
       border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 12px 15px;
+      border-radius: 8px;
+      padding: 8px 12px;
     }
     .kpi-title {
-      font-size: 0.7em;
+      font-size: 0.65em;
       color: var(--text-muted);
       text-transform: uppercase;
       font-weight: 700;
     }
     .kpi-value {
-      font-size: 1.2em;
+      font-size: 1.1em;
       font-weight: 800;
     }
     .kpi-value.blue { color: var(--accent-cyan); text-shadow: 0 0 8px rgba(56, 189, 248, 0.4); }
     .kpi-value.red { color: var(--accent-red); text-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }
 
     .chart-box {
-      height: 200px;
+      height: 240px;
       position: relative;
     }
 
     .chart-title {
-      font-size: 0.75em;
+      font-size: 0.7em;
       color: var(--accent-cyan);
       text-transform: uppercase;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.72em;
-      margin-top: 5px;
+      font-size: 0.68em;
     }
     th {
       color: var(--text-muted);
       border-bottom: 1px solid var(--border-color);
-      padding: 6px 2px;
+      padding: 4px 2px;
       text-align: center;
       text-transform: uppercase;
     }
     td {
-      padding: 8px 2px;
+      padding: 5px 2px;
       text-align: center;
       border-bottom: 1px solid rgba(255,255,255,0.03);
     }
     .blue-text { color: var(--accent-cyan); font-weight: 700; }
     .red-text { color: var(--accent-red); font-weight: 700; }
+
+    /* Adaptación para pantallas pequeñas (Celulares) */
+    @media (max-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
 
-<div class="dashboard">
+<div class="dashboard-container">
 
+  <!-- Header -->
   <div class="header">
-    <h1>SmartMonitor <span style="color: var(--accent-cyan); font-weight: 300;">| IA Financiera</span></h1>
-    <p>Inferencia en Borde • Proyección Semestral (6 Meses)</p>
-  </div>
-
-  <div class="card controls">
-    <button class="btn-sync" onclick="sincronizarPesos()">1. Sincronizar Modelo (API)</button>
-    <div id="status" class="status-text">Estado: Esperando acción...</div>
-
-    <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 4px;">
-      <label for="mesInicio">Mes de Inicio Semestre</label>
-      <input type="number" id="mesInicio" value="10" min="1">
-    </div>
-
-    <button class="btn-calc" onclick="calcularProyeccion()">2. Ejecutar Inferencia IA</button>
-  </div>
-
-  <!-- KPI Resumen Semestral -->
-  <div class="kpi-badge" id="kpiCard" style="display: none;">
     <div>
-      <div class="kpi-title">Neto Acumulado Semestre (6M)</div>
-      <div id="kpiLabel" style="font-size: 0.75em; color: #cbd5e1; margin-top: 2px;">--</div>
+      <h1>SmartMonitor <span style="color: var(--accent-cyan); font-weight: 300;">| IA Financiera</span></h1>
+      <p>Inferencia en Borde • Proyección Semestral (6 Meses)</p>
     </div>
-    <div id="kpiValue" class="kpi-value blue">$0.00M</div>
+    <!-- KPI Resumen -->
+    <div class="kpi-badge" id="kpiCard" style="display: none; min-width: 220px;">
+      <div>
+        <div class="kpi-title">Neto Semestre (6M)</div>
+        <div id="kpiLabel" style="font-size: 0.65em; color: #cbd5e1;">--</div>
+      </div>
+      <div id="kpiValue" class="kpi-value blue">$0.00M</div>
+    </div>
   </div>
 
-  <!-- Gráfico 1: Área de Flujo Neto -->
-  <div class="card chart-box" id="chartCard1" style="display: none;">
-    <div class="chart-title">Evolución de Flujo Neto Mensual</div>
-    <div style="height: 170px;"><canvas id="flujoChart"></canvas></div>
-  </div>
+  <!-- Layout Principal -->
+  <div class="main-grid">
 
-  <!-- Gráfico 2: Comparativa vs Interés Bancario 3% -->
-  <div class="card chart-box" id="chartCard2" style="display: none;">
-    <div class="chart-title">Comparativa: Flujo Operativo vs Interés 3% Vtas</div>
-    <div style="height: 170px;"><canvas id="comparativaChart"></canvas></div>
-  </div>
+    <!-- Columna Izquierda: Panel de Control y Tabla -->
+    <div class="left-column">
+      <div class="card controls">
+        <button class="btn-sync" onclick="sincronizarPesos()">1. Sincronizar Modelo (API)</button>
+        <div id="status" class="status-text">Estado: Esperando acción...</div>
 
-  <!-- Tabla Detalle -->
-  <div class="card" id="tablaCard" style="display: none;">
-    <div id="resultadoTabla"></div>
+        <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+          <label for="mesInicio">Mes Inicial</label>
+          <input type="number" id="mesInicio" value="10" min="1">
+        </div>
+
+        <button class="btn-calc" onclick="calcularProyeccion()">2. Ejecutar Inferencia IA</button>
+      </div>
+
+      <!-- Tabla Detalle -->
+      <div class="card" id="tablaCard" style="display: none;">
+        <div id="resultadoTabla"></div>
+      </div>
+    </div>
+
+    <!-- Columna Derecha: Gráficos lado a lado -->
+    <div class="charts-grid">
+      <!-- Gráfico 1 -->
+      <div class="card chart-box" id="chartCard1" style="display: none;">
+        <div class="chart-title">Flujo Neto Mensual</div>
+        <div style="height: 200px;"><canvas id="flujoChart"></canvas></div>
+      </div>
+
+      <!-- Gráfico 2 -->
+      <div class="card chart-box" id="chartCard2" style="display: none;">
+        <div class="chart-title">Flujo vs Interés 3% Vtas</div>
+        <div style="height: 200px;"><canvas id="comparativaChart"></canvas></div>
+      </div>
+    </div>
+
   </div>
 
 </div>
@@ -236,10 +283,10 @@
       const data = await response.json();
       localStorage.setItem("pesos_modelo", JSON.stringify(data.pesos));
       statusDiv.style.color = "#38bdf8";
-      statusDiv.innerText = `Modelo sincronizado: w=${data.pesos.w}, b=${data.pesos.b}`;
+      statusDiv.innerText = `Modelo listo: w=${data.pesos.w}, b=${data.pesos.b}`;
     } catch (e) {
       statusDiv.style.color = "#ef4444";
-      statusDiv.innerText = "Error de sincronización con Render.";
+      statusDiv.innerText = "Error de sincronización.";
     }
   }
 
@@ -254,10 +301,9 @@
 
     const { w, b } = JSON.parse(pesosGuardados);
     
-    // NUEVOS PARÁMETROS SOLICITADOS
-    const MARGEN_COMPRAS = 0.70; // 70% Compras
-    const GASTO_FIJO = 5.0;      // $5M Fijos
-    const TASA_BANCO = 0.03;     // 3% Interés Bancario
+    const MARGEN_COMPRAS = 0.70;
+    const GASTO_FIJO = 5.0;     
+    const TASA_BANCO = 0.03;    
 
     let mesesLabels = [];
     let flujosData = [];
@@ -270,16 +316,15 @@
           <tr>
             <th>Mes</th>
             <th>Ventas</th>
-            <th>Comp.(70%)</th>
+            <th>Comp.</th>
             <th>Fijos</th>
             <th>Neto</th>
-            <th>Banco(3%)</th>
+            <th>Banco</th>
           </tr>
         </thead>
         <tbody>
     `;
 
-    // PROYECCIÓN A 6 MESES (SEMESTRE)
     for (let i = 0; i < 6; i++) {
       let m = mesInicio + i;
       let ventaIA = (w * m) + b;
@@ -311,7 +356,7 @@
         </tbody>
         <tfoot>
           <tr style="font-weight: bold; border-top: 1px solid #334155;">
-            <td colspan="4" style="text-align: right; color: var(--text-muted);">NETO SEMESTRE:</td>
+            <td colspan="4" style="text-align: right; color: var(--text-muted);">TOTAL:</td>
             <td class="${claseTotal}">$${totalFlujo.toFixed(2)}M</td>
             <td>--</td>
           </tr>
@@ -321,31 +366,30 @@
 
     document.getElementById("resultadoTabla").innerHTML = htmlTabla;
 
-    // Mostrar tarjetas
+    // Mostrar Secciones
     document.getElementById("kpiCard").style.display = "flex";
     document.getElementById("chartCard1").style.display = "block";
     document.getElementById("chartCard2").style.display = "block";
     document.getElementById("tablaCard").style.display = "block";
 
-    // KPI Header (Azul si es > 0, Rojo si es < 0)
+    // KPI Header
     const kpiValue = document.getElementById("kpiValue");
     const kpiLabel = document.getElementById("kpiLabel");
 
     if (totalFlujo >= 0) {
       kpiValue.className = "kpi-value blue";
       kpiValue.innerText = `+$${totalFlujo.toFixed(2)}M`;
-      kpiLabel.innerText = "Estructura Saludable (Superávit)";
+      kpiLabel.innerText = "Superávit Semestral";
     } else {
       kpiValue.className = "kpi-value red";
       kpiValue.innerText = `-$${Math.abs(totalFlujo).toFixed(2)}M`;
-      kpiLabel.innerText = "Déficit Semestral Proyectado";
+      kpiLabel.innerText = "Déficit Semestral";
     }
 
     renderizarGraficoFlujo(mesesLabels, flujosData);
     renderizarGraficoComparativo(mesesLabels, flujosData, interesBancarioData);
   }
 
-  // Gráfico 1: Área Azul / Roja
   function renderizarGraficoFlujo(labels, data) {
     const ctx = document.getElementById('flujoChart').getContext('2d');
     if (chartInstance1) chartInstance1.destroy();
@@ -372,8 +416,8 @@
           borderColor: '#38bdf8',
           fill: {
             target: 'origin',
-            above: gradientBlue, // Azul arriba de cero
-            below: gradientRed   // Rojo abajo de cero
+            above: gradientBlue,
+            below: gradientRed
           }
         }]
       },
@@ -395,7 +439,6 @@
     });
   }
 
-  // Gráfico 2: Comparativa Flujo Neto vs Rendimiento 3%
   function renderizarGraficoComparativo(labels, flujoData, bancoData) {
     const ctx = document.getElementById('comparativaChart').getContext('2d');
     if (chartInstance2) chartInstance2.destroy();
@@ -406,20 +449,20 @@
         labels: labels,
         datasets: [
           {
-            label: 'Flujo Neto (IA)',
+            label: 'Flujo IA',
             data: flujoData,
-            borderColor: '#38bdf8', // Azul
+            borderColor: '#38bdf8',
             borderWidth: 2,
             tension: 0.3,
-            pointRadius: 4,
+            pointRadius: 3,
             pointBackgroundColor: flujoData.map(v => v >= 0 ? '#38bdf8' : '#ef4444')
           },
           {
-            label: 'Interés 3% Vtas',
+            label: 'Banco 3%',
             data: bancoData,
-            borderColor: '#f97316', // Naranja/Línea de comparación
+            borderColor: '#f97316',
             borderWidth: 2,
-            borderDash: [5, 5],    // Línea punteada
+            borderDash: [4, 4],
             tension: 0.3,
             pointRadius: 3,
             pointBackgroundColor: '#f97316'
@@ -432,7 +475,7 @@
         plugins: {
           legend: {
             display: true,
-            labels: { color: '#94a3b8', font: { size: 9 }, boxWidth: 12 }
+            labels: { color: '#94a3b8', font: { size: 9 }, boxWidth: 10 }
           }
         },
         scales: {
