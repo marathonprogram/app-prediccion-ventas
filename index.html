@@ -12,6 +12,7 @@
       --border-color: #1e293b;
       --accent-blue: #2563eb;
       --accent-cyan: #38bdf8;
+      --accent-green: #22c55e;
       --accent-red: #ef4444;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
@@ -63,7 +64,7 @@
     /* Layout 50% Izquierda - 50% Derecha */
     .main-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr; /* Exactamente 50% y 50% */
+      grid-template-columns: 1fr 1fr;
       gap: 12px;
       align-items: stretch;
     }
@@ -81,6 +82,47 @@
       border-radius: 10px;
       padding: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    /* Panel Técnico de MLOps / Auditoría de IA */
+    .mlops-card {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px dashed rgba(56, 189, 248, 0.3);
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-top: 4px;
+    }
+    .mlops-title {
+      font-size: 0.65em;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .mlops-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      text-align: center;
+    }
+    .metric-item {
+      background: rgba(2, 6, 23, 0.6);
+      padding: 4px;
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+    }
+    .metric-label {
+      font-size: 0.58em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .metric-val {
+      font-size: 0.85em;
+      font-weight: 800;
+      color: #fff;
     }
 
     label {
@@ -185,11 +227,8 @@
     .blue-text { color: var(--accent-cyan); font-weight: 700; }
     .red-text { color: var(--accent-red); font-weight: 700; }
 
-    /* Adaptación para pantallas táctiles/celulares */
     @media (max-width: 900px) {
-      .main-grid {
-        grid-template-columns: 1fr;
-      }
+      .main-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -216,13 +255,35 @@
   <!-- Layout Principal (50% Izquierda / 50% Derecha) -->
   <div class="main-grid">
 
-    <!-- Columna Izquierda (Controles + Tabla) -->
+    <!-- Columna Izquierda (Controles + Panel MLOps + Tabla) -->
     <div class="left-column">
       <div class="card controls">
         <button class="btn-sync" onclick="sincronizarPesos()">1. Sincronizar Modelo (API)</button>
         <div id="status" class="status-text">Estado: Esperando acción...</div>
 
-        <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+        <!-- Panel Técnico MLOps (Auditoría de IA) -->
+        <div class="mlops-card" id="mlopsPanel" style="display: none;">
+          <div class="mlops-title">
+            <span>Auditoría de Modelo (Render)</span>
+            <span id="mlopsStatus" style="color: var(--accent-green);">● OPTIMAL</span>
+          </div>
+          <div class="mlops-metrics">
+            <div class="metric-item">
+              <div class="metric-label">Ajuste (R²)</div>
+              <div class="metric-val" id="r2Val" style="color: var(--accent-cyan);">--</div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-label">Error (MSE)</div>
+              <div class="metric-val" id="mseVal">--</div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-label">Fiabilidad</div>
+              <div class="metric-val" id="trustVal" style="color: var(--accent-green);">--</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 6px;">
           <label for="mesInicio">Mes Inicial</label>
           <input type="number" id="mesInicio" value="10" min="1">
         </div>
@@ -236,15 +297,13 @@
       </div>
     </div>
 
-    <!-- Columna Derecha (Gráfico 1 Arriba, Gráfico 2 Abajo) -->
+    <!-- Columna Derecha (Gráficos) -->
     <div class="right-column">
-      <!-- Gráfico 1: Flujo Neto Mensual -->
       <div class="card chart-box" id="chartCard1" style="display: none;">
         <div class="chart-title">Flujo Neto Mensual</div>
         <div style="height: 170px;"><canvas id="flujoChart"></canvas></div>
       </div>
 
-      <!-- Gráfico 2: Flujo vs Interés 3% Vtas -->
       <div class="card chart-box" id="chartCard2" style="display: none;">
         <div class="chart-title">Flujo vs Interés 3% Vtas</div>
         <div style="height: 170px;"><canvas id="comparativaChart"></canvas></div>
@@ -269,9 +328,26 @@
       const response = await fetch(API_URL);
       if (!response.ok) throw new Error();
       const data = await response.json();
+      
+      // Guardar pesos y métricas en memoria local
       localStorage.setItem("pesos_modelo", JSON.stringify(data.pesos));
+      if (data.metricas) {
+        localStorage.setItem("metricas_modelo", JSON.stringify(data.metricas));
+      }
+
       statusDiv.style.color = "#38bdf8";
       statusDiv.innerText = `Modelo listo: w=${data.pesos.w}, b=${data.pesos.b}`;
+
+      // Desplegar métricas técnicas en el panel MLOps
+      if (data.metricas) {
+        document.getElementById("mlopsPanel").style.display = "block";
+        document.getElementById("r2Val").innerText = (data.metricas.r2_score * 100).toFixed(1) + "%";
+        document.getElementById("mseVal").innerText = data.metricas.mse.toFixed(2);
+        
+        let trustScore = (data.metricas.r2_score * 100).toFixed(0);
+        document.getElementById("trustVal").innerText = trustScore + "%";
+      }
+
     } catch (e) {
       statusDiv.style.color = "#ef4444";
       statusDiv.innerText = "Error de sincronización.";
@@ -354,13 +430,11 @@
 
     document.getElementById("resultadoTabla").innerHTML = htmlTabla;
 
-    // Mostrar Secciones
     document.getElementById("kpiCard").style.display = "flex";
     document.getElementById("chartCard1").style.display = "block";
     document.getElementById("chartCard2").style.display = "block";
     document.getElementById("tablaCard").style.display = "block";
 
-    // KPI Header
     const kpiValue = document.getElementById("kpiValue");
     const kpiLabel = document.getElementById("kpiLabel");
 
